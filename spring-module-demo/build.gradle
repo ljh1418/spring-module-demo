@@ -1,0 +1,119 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.0'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+
+// 
+bootJar.enabled = false //Spring Boot 애플리케이션을 실행 가능한 JAR 파일로 패키징합니다.
+jar.enabled = true //기본 JAR 파일 생성을 방지하여, 필요한 실행 가능한 JAR 파일만 생성됩니다.
+
+
+// allprojects : Gradle 빌드 스크립트에서 모든 서브프로젝트에 공통 설정을 적용할 때 사용하는 구조입니다.
+allprojects {
+    group = 'com.example.demo'
+	version = '0.3'
+    sourceCompatibility = '17'
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+// subprojects : settings.gradle에 include된 프로젝트를 전부 관리하는 공간입니다.
+subprojects {
+
+	apply plugin: 'java' // java 플러그인은 기본적인 Java 컴파일 및 테스트 태스크를 제공하며, src/main/java와 src/test/java 디렉터리에서 소스 코드를 컴파일하고, 테스트를 실행할 수 있도록 합니다.
+    apply plugin: 'java-library' // java-library 플러그인은 java 플러그인의 확장으로, 라이브러리 개발을 위해 필요한 추가 기능을 제공합니다. 특히, api와 implementation의 종속성 구분을 지원하여, 라이브러리의 API와 구현을 분리할 수 있습니다. 
+    apply plugin: 'org.springframework.boot' // 플러그인은 Spring Boot 애플리케이션을 빌드하고 실행할 수 있도록 지원합니다. 이 플러그인을 적용하면 bootJar, bootRun 등의 Spring Boot 전용 태스크를 사용할 수 있습니다.
+    apply plugin: 'io.spring.dependency-management' //  Spring의 의존성 관리 기능을 Gradle 빌드 시스템에 통합합니다. Spring Boot의 의존성 버전을 자동으로 관리할 수 있으며, dependencyManagement 블록을 사용하여 의존성의 버전을 중앙에서 관리할 수 있습니다.
+
+	configurations {
+		compileOnly {
+			extendsFrom annotationProcessor
+		}
+	}
+	
+	repositories {
+		mavenCentral()
+	}
+	
+	// 루트프로젝트에서 의존성관리
+	dependencies {
+		implementation 'org.springframework.boot:spring-boot-starter'
+		implementation 'org.springframework.boot:spring-boot-starter-web'
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+		runtimeOnly 'com.mysql:mysql-connector-j'
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+		implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+        implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0'
+        implementation 'org.modelmapper:modelmapper:3.1.1'
+		
+	}
+}
+
+// 모듈 프로젝트 설정
+project(':module-api') {
+    
+    jar {
+        archivesBaseName = 'module-api' // jar 파일 이름 설정
+    }
+    bootJar.enabled = true  // Spring Boot 애플리케이션용 실행 가능한 jar 파일을 생성하도록 합니다.
+    jar.enabled = false // 기본 jar 파일 생성을 방지하여, 필요한 실행 가능한 jar 파일만 생성됩니다.
+    
+    version '2.0' // 프로젝트 버전을 1.0으로 설정
+    
+    dependencies {
+        // 모듈 프로젝트 의존성 주입
+        implementation project(':module-mapper')
+        implementation project(':module-core')
+        
+        
+    }
+}
+
+project(':module-core') {
+    
+    jar {
+        archivesBaseName = 'module-core' // jar 파일 이름 설정
+    }
+    bootJar.enabled = true  // Spring Boot 애플리케이션용 실행 가능한 jar 파일을 생성하도록 합니다.
+    jar.enabled = false // 기본 jar 파일 생성을 방지하여, 필요한 실행 가능한 jar 파일만 생성됩니다.
+    
+    version '2.0' // 프로젝트 버전을 1.0으로 설정
+    
+    
+    dependencies {
+        // module-core 프로젝트 의존성 주입
+        //implementation project(':module-core')
+        //implementation project(':module-repository')
+    }
+}
+
+project(':module-mapper') {
+    jar {
+        archivesBaseName = 'module-mapper'
+    }
+
+    //bootJar.enabled = false  //bootJar: Spring Boot 애플리케이션용으로 특별히 실행 가능한 JAR을 생성
+    //jar.enabled = true //jar: 모든 Java 프로젝트에 대한 표준 JAR 파일을 생성
+    
+    bootJar.enabled = true  // Spring Boot 애플리케이션용 실행 가능한 jar 파일을 생성하도록 합니다.
+    jar.enabled = false // 기본 jar 파일 생성을 방지하여, 필요한 실행 가능한 jar 파일만 생성됩니다.
+    
+       version '2.0' // 프로젝트 버전을 1.0으로 설정
+
+    // 버전별로 jar 생성을 위해 필요 (버전별 관리가 필요함.)
+    //version '1.0.0-SNAPSHOT'
+    
+    dependencies {
+    	//implementation project(':module-core')
+    }
+}
+
+
