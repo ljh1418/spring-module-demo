@@ -10,7 +10,7 @@ bootJar.enabled = false //Spring Boot 애플리케이션을 실행 가능한 JAR
 jar.enabled = true //기본 JAR 파일 생성을 방지하여, 필요한 실행 가능한 JAR 파일만 생성됩니다.
 
 
-// allprojects : Gradle 빌드 스크립트에서 모든 서브프로젝트에 공통 설정을 적용할 때 사용하는 구조입니다.
+// allprojects : Gradle 빌드 스크립트에서 모든 서브프로젝트에 공통 설정을 적용할 때 사용하는 구조입니다. test
 allprojects {
     group = 'com.example.demo'
 	version = '0.3'
